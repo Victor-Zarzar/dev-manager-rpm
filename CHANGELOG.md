@@ -1,6 +1,19 @@
 # Changelog
 
-## Unreleased
+## Unreleased (server branch)
+
+### Changed
+
+- `setup.sh` re-scoped to match [dev-setup-rpm-server](https://github.com/Victor-Zarzar/dev-setup-rpm-server): now only installs Git, Docker, Terraform, kubectl, Minikube, AWS CLI, Azure CLI, Ansible, eksctl, Prometheus, SQLite/MySQL/PostgreSQL/Redis, Nginx, NVM, and Pyenv. No desktop/GUI packages, Snap, Flatpak, fonts, manual editor installs, NVIDIA drivers, or shell enhancements (bat/eza/zoxide/Starship/Zim/FVM).
+- Moved `install_git` from `lib/dnf.sh` into `lib/git.sh` (which already had `configure_git`), since `lib/dnf.sh` (desktop-only) was removed on this branch.
+- Removed desktop-only libraries not used by this branch's `setup.sh` or by `maintenance.sh`: `lib/dnf.sh`, `lib/snap.sh`, `lib/flatpak.sh`, `lib/fonts.sh`, `lib/manual.sh`, `lib/nvidia.sh`, `lib/shell_tools.sh`.
+- Updated the banner in `lib/helpers.sh` from "RPM DESKTOP" to "RPM SERVER" (same `ansi_shadow` font/layout, shared cosmetically with `maintenance.sh`).
+
+### Unchanged
+
+- `maintenance.sh` and every `lib/*-clean.sh` / `lib/storage-optimize.sh` / `lib/restart-system.sh` module are byte-for-byte identical to the `main` branch.
+
+## Unreleased (main branch)
 
 ### Features
 
