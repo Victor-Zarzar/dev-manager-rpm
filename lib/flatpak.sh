@@ -30,6 +30,9 @@ install_flatpak_apps() {
         "io.github.thetumultuousunicornofdarkness.cpu-x:CPU-X"
         "com.github.jeromerobert.pdfarranger:PDF Arranger"
         "org.gnome.Boxes:Boxes"
+        "org.freedownloadmanager.Manager:Free Download Manager"
+        "ru.linux_gaming.PortProton: Port Proton"
+        "net.davidotek.pupgui2: PUP GUI"
     )
 
     for app in "${apps[@]}"; do
