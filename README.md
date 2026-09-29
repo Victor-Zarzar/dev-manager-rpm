@@ -77,8 +77,8 @@ A modular, idempotent automated **setup + maintenance** toolkit for Fedora, RHEL
 ## Installation
 
 ```bash
-git clone https://github.com/Victor-Zarzar/dev-manager-rpm-desktop
-cd dev-manager-rpm-desktop
+git clone https://github.com/Victor-Zarzar/dev-manager-rpm
+cd dev-manager-rpm
 chmod +x setup.sh maintenance.sh
 
 ./setup.sh        # install the dev environment
