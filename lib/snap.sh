@@ -16,6 +16,7 @@ install_snap_apps() {
         "brave:Brave"
         "spotify:Spotify"
         "slack --classic:Slack"
+        "discord:Discord"
         "telegram-desktop:Telegram"
         "figma-linux:Figma"
         "proton-vpn:Proton VPN"

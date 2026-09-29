@@ -52,6 +52,9 @@ A modular, idempotent automated **setup + maintenance** toolkit for Fedora, RHEL
 - **Snap**: Postman, Figma, Proton VPN, Notion, Trello, WhatsApp, Slack, Telegram, Spotify, Brave, LocalSend
 - **Flatpak**: LibreOffice, CPU-X, PDF Arranger, Boxes (VM manager)
 - **Browsers**: Firefox (Snap, optional), Google Chrome, Brave (Snap)
+- **Extras** (`lib/extras.sh`):
+- **Proton Authenticator**: official `.rpm` (x86_64), latest version resolved from Proton's `version.json` with SHA512 verification
+- **DaVinci Resolve (free)**: official `.run` installer, requires a manual download (see [DaVinci Resolve](#davinci-resolve))
 
 ### Graphics & Drivers
 
@@ -110,6 +113,7 @@ dev-manager-rpm-desktop/
 │   ├── git.sh             # Git configuration
 │   ├── nvidia.sh          # NVIDIA driver installation (RPM Fusion / ELRepo)
 │   ├── shell_tools.sh     # bat, eza, exa, zoxide, Starship, Zim, FVM
+│   ├── extras.sh          # Proton Authenticator (.rpm), DaVinci Resolve (free, .run)
 │   │
 │   │   # --- maintenance.sh modules ---
 │   ├── package-clean.sh   # DNF cache/orphans, RPM db, Snap, Flatpak cleaning
@@ -154,9 +158,13 @@ dev-manager-rpm-desktop/
 26) Install CLI enhancements (bat, eza, exa, zoxide, Starship)
 27) Install Zim (Zsh framework)
 28) Install FVM (Flutter Version Management)
-29) View installation log
+29) Install Proton Authenticator
+30) Install DaVinci Resolve (free)
+31) View installation log
  0) Exit
 ```
+
+> **Note:** option `1` (complete setup) includes Proton Authenticator but **not** DaVinci Resolve, since Resolve requires a manual download and an interactive installer. Run option `30` separately.
 
 ## Maintenance Menu Options
 
@@ -189,6 +197,7 @@ dev-manager-rpm-desktop/
 ## What Gets Cleaned
 
 ### Package Management
+
 - **DNF cache**: downloaded package archives and metadata (`dnf clean all`)
 - **RPM database**: consistency check and rebuild (`rpm --rebuilddb`)
 - **Orphaned packages**: no-longer-needed dependencies (`dnf autoremove`)
@@ -197,6 +206,7 @@ dev-manager-rpm-desktop/
 - **Flatpak**: unused runtimes and dependencies
 
 ### Development Tools
+
 - **NPM/NVM**: package manager cache
 - **Bun**: install cache, global cache, logs older than 7 days
 - **PNPM**: store pruning
@@ -207,6 +217,7 @@ dev-manager-rpm-desktop/
 - **Docker**: unused containers, images, volumes, networks, and build cache
 
 ### System Maintenance
+
 - **System logs**: journal vacuum (7 days / 200 MB cap), rotated log archives
 - **User caches**: browser caches, thumbnails, trash
 - **Temporary files**: `/tmp` (2+ days) and `/var/tmp` (7+ days)
@@ -272,6 +283,53 @@ fvm install stable
 fvm use stable
 ```
 
+## Proton Authenticator
+
+Installed from Proton's official `.rpm` (x86_64 only). The script:
+
+1. Fetches `https://proton.me/download/authenticator/linux/version.json`
+2. Picks the latest `.x86_64.rpm` entry
+3. Downloads it and verifies the **SHA512** checksum (aborts on mismatch)
+4. Installs it with `dnf install`
+
+It is skipped if `proton-authenticator` is already installed. Unlike the `.deb`, the `.rpm` may not configure an update repository, so to update just run option `29` again after removing the old version, or check with `dnf repolist` whether Proton added a repo.
+
+## DaVinci Resolve
+
+The **free** edition is installed using Blackmagic's official `.run` installer. Blackmagic requires a registration form, so the ZIP has to be downloaded manually:
+
+1. Download `DaVinci_Resolve_<version>_Linux.zip` from https://www.blackmagicdesign.com/event/davinciresolvedownload
+2. Leave it in `~/Downloads` (or point elsewhere with `RESOLVE_SRC_DIR`)
+3. Run option `30`
+
+What the script does:
+
+- Installs dependencies via DNF (`unzip`, `xcb-util-cursor`, `apr`, `apr-util`, `mesa-libGLU`, `libxcrypt-compat`, `fuse-libs`, `alsa-lib`)
+- Extracts the ZIP into `~/resolve_build` (needs roughly 15 GB free; warns if less)
+- Runs the installer with `SKIP_PACKAGE_CHECK=1 ... -i -y` (required on non-supported distros such as Fedora)
+- Moves Resolve's bundled `libglib`, `libgio` and `libgmodule` to `/opt/resolve/libs/disabled-libraries`, which avoids conflicts with the system glib
+- Optionally removes the build directory
+
+Environment variables:
+
+| Variable          | Default       | Description                                                                                                                      |
+| ----------------- | ------------- | -------------------------------------------------------------------------------------------------------------------------------- |
+| `RESOLVE_SRC_DIR` | `~/Downloads` | Folder where the Resolve ZIP is located                                                                                          |
+| `RESOLVE_EDITION` | `free`        | `free` or `studio`. Studio expects `DaVinci_Resolve_Studio_*_Linux.zip` and requires your own license (activation key or dongle) |
+
+```bash
+# Default (free), ZIP in ~/Downloads
+./setup.sh
+
+# ZIP in a custom folder
+RESOLVE_SRC_DIR=/path/to/folder ./setup.sh
+
+# Studio edition
+RESOLVE_EDITION=studio ./setup.sh
+```
+
+Resolve needs a working GPU driver. On NVIDIA systems, install the drivers first (option `25`) and confirm `nvidia-smi` works.
+
 ## Log Files
 
 Each entry point keeps its own timestamped log:
@@ -320,6 +378,31 @@ sudo dracut --force
 # Reinstall using the script
 ./setup.sh  # Select option 25
 ```
+
+**DaVinci Resolve: "ZIP not found":**
+
+```bash
+# The script looks for the free edition by default
+ls ~/Downloads/DaVinci_Resolve_*_Linux.zip
+
+# Studio ZIP (has "Studio" in the name) needs:
+RESOLVE_EDITION=studio ./setup.sh
+```
+
+**DaVinci Resolve does not start:**
+
+```bash
+# Confirm the GPU driver works
+nvidia-smi
+
+# Only one OpenCL ICD should exist
+ls /etc/OpenCL/vendors/
+
+# Run from the terminal to see the error
+/opt/resolve/bin/resolve
+```
+
+If the error mentions `libglib`/`libgio`, make sure the bundled copies are in `/opt/resolve/libs/disabled-libraries`.
 
 **Package install fails (e.g. MySQL, Redis, kdiskmark):**
 
