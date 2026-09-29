@@ -24,6 +24,7 @@ source "$SCRIPT_DIR/lib/dev.sh"
 source "$SCRIPT_DIR/lib/git.sh"
 source "$SCRIPT_DIR/lib/nvidia.sh"
 source "$SCRIPT_DIR/lib/shell_tools.sh"
+source "$SCRIPT_DIR/lib/extras.sh"
 
 # ============================================
 # Interactive Menu
@@ -64,7 +65,9 @@ show_menu() {
     echo "26) Install CLI enhancements (bat, eza, exa, zoxide, Starship)"
     echo "27) Install Zim (Zsh framework)"
     echo "28) Install FVM (Flutter Version Management)"
-    echo "29) View installation log"
+    echo "29) Install Proton Authenticator"
+    echo "30) Install DaVinci Resolve (free)"
+    echo "31) View installation log"
     echo "0)  Exit"
     echo ""
     echo -n "Choose an option: "
@@ -101,6 +104,7 @@ run_full_setup() {
     install_cli_enhancements
     install_zim
     install_fvm
+    install_proton_authenticator
 
     echo ""
     print_section "Setup Summary"
@@ -167,7 +171,9 @@ main() {
             26) install_cli_enhancements ;;
             27) install_zim ;;
             28) install_fvm ;;
-            29) cat "$LOG_FILE" | less ;;
+            29) install_proton_authenticator ;;
+            30) install_davinci_resolve ;;
+            31) cat "$LOG_FILE" | less ;;
             0)
                 print_success "Goodbye!"
                 log_action "Script finished"
