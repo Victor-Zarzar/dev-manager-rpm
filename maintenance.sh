@@ -19,6 +19,7 @@ source "$SCRIPT_DIR/lib/docker-clean.sh"
 source "$SCRIPT_DIR/lib/system-clean.sh"
 source "$SCRIPT_DIR/lib/storage-optimize.sh"
 source "$SCRIPT_DIR/lib/restart-system.sh"
+source "$SCRIPT_DIR/lib/expo-clean.sh"
 
 # ============================================
 # Interactive Menu
@@ -42,17 +43,18 @@ show_menu() {
     echo "9)  Clean Bun"
     echo "10) Clean PNPM"
     echo "11) Clean Flutter/Dart/FVM"
-    echo "12) Clean Android Studio"
-    echo "13) Clean Docker"
-    echo "14) Remove old kernels"
-    echo "15) Clean logs"
-    echo "16) Clean user caches"
-    echo "17) Clean temporary files"
-    echo "18) Clean PIP cache"
-    echo "19) Optimize databases"
-    echo "20) Verify system health"
-    echo "21) View action log"
-    echo "22) Restart system"
+    echo "12) Clean Expo & React Native"
+    echo "13) Clean Android Studio"
+    echo "14) Clean Docker"
+    echo "15) Remove old kernels"
+    echo "16) Clean logs"
+    echo "17) Clean user caches"
+    echo "18) Clean temporary files"
+    echo "19) Clean PIP cache"
+    echo "20) Optimize databases"
+    echo "21) Verify system health"
+    echo "22) View action log"
+    echo "23) Restart system"
     echo "0)  Exit"
     echo ""
     echo -n "Choose an option: "
@@ -72,6 +74,7 @@ run_full_maintenance() {
     clean_bun
     clean_pnpm
     clean_flutter_dart_fvm
+    clean_expo_react_native
     clean_android_studio
     clean_docker
     remove_old_kernels
@@ -129,17 +132,18 @@ main() {
             9) clean_bun ;;
             10) clean_pnpm ;;
             11) clean_flutter_dart_fvm ;;
-            12) clean_android_studio ;;
-            13) clean_docker ;;
-            14) remove_old_kernels ;;
-            15) clean_logs ;;
-            16) clean_user_caches ;;
-            17) clean_temp_files ;;
-            18) clean_pip ;;
-            19) optimize_databases ;;
-            20) verify_system_health ;;
-            21) cat "$LOG_FILE" | less ;;
-            22) restart_system ;;
+            12) clean_expo_react_native ;;
+            13) clean_android_studio ;;
+            14) clean_docker ;;
+            15) remove_old_kernels ;;
+            16) clean_logs ;;
+            17) clean_user_caches ;;
+            18) clean_temp_files ;;
+            19) clean_pip ;;
+            20) optimize_databases ;;
+            21) verify_system_health ;;
+            22) cat "$LOG_FILE" | less ;;
+            23) restart_system ;;
             0)
                 print_success "Goodbye!"
                 log_action "Script finished"

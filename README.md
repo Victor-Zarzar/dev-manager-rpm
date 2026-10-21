@@ -119,6 +119,7 @@ dev-manager-rpm-desktop/
 │   ├── package-clean.sh   # DNF cache/orphans, RPM db, Snap, Flatpak cleaning
 │   ├── node-clean.sh      # NPM/NVM, Bun, PNPM, PIP cache cleaning
 │   ├── flutter-clean.sh   # Flutter/Dart/FVM cache cleaning
+│   ├── expo-clean.sh      # Expo, EAS, Metro, Watchman, React Native Android build cleaning
 │   ├── android-clean.sh   # Android Studio & Emulator cache cleaning
 │   ├── docker-clean.sh    # Docker system prune
 │   ├── system-clean.sh    # Journal logs, user caches, temp files, health check
@@ -180,17 +181,18 @@ dev-manager-rpm-desktop/
 9)  Clean Bun
 10) Clean PNPM
 11) Clean Flutter/Dart/FVM
-12) Clean Android Studio
-13) Clean Docker
-14) Remove old kernels
-15) Clean logs
-16) Clean user caches
-17) Clean temporary files
-18) Clean PIP cache
-19) Optimize databases
-20) Verify system health
-21) View action log
-22) Restart system
+12) Clean Expo & React Native
+13) Clean Android Studio
+14) Clean Docker
+15) Remove old kernels
+16) Clean logs
+17) Clean user caches
+18) Clean temporary files
+19) Clean PIP cache
+20) Optimize databases
+21) Verify system health
+22) View action log
+23) Restart system
  0) Exit
 ```
 
@@ -212,6 +214,7 @@ dev-manager-rpm-desktop/
 - **PNPM**: store pruning
 - **PIP**: package cache
 - **Flutter/Dart/FVM**: Dart pub cache; reports FVM's cached SDK versions size (removed manually with `fvm remove <version>` since a project may still need it); runs `flutter clean` when inside a Flutter project
+- **Expo & React Native**: Expo CLI cache (`~/.expo/cache`), EAS CLI cache (`~/.eas`), Watchman watches (`watchman watch-del-all`, if installed), Metro bundler and haste-map caches in the temp dir, and `android/app/build` directories found in your projects folder (asks for confirmation first). Your Expo login (`~/.expo/state.json`) is not touched
 - **Android Studio & Emulator**: AVD caches, build cache, IDE caches and logs
 - **Gradle**: size reported only, not removed automatically (same reasoning as Flutter/Android: deleting it forces a slow rebuild)
 - **Docker**: unused containers, images, volumes, networks, and build cache
@@ -329,6 +332,24 @@ RESOLVE_EDITION=studio ./setup.sh
 ```
 
 Resolve needs a working GPU driver. On NVIDIA systems, install the drivers first (option `25`) and confirm `nvidia-smi` works.
+
+## Expo & React Native Cleaning
+
+`lib/expo-clean.sh` (maintenance option `12`) frees space used by Expo and React Native tooling:
+
+- `~/.expo/cache`: Expo CLI cache (your login in `~/.expo/state.json` is kept)
+- `~/.eas`: EAS CLI cache
+- Watchman: runs `watchman watch-del-all` if Watchman is installed
+- Metro: `metro-*`, `haste-map-*` and `react-native-packager-cache-*` in the temp dir (`$TMPDIR`, or `/tmp`)
+- Android build artifacts: lists every `android/app/build` directory found under your projects folder and asks before removing them
+
+By default it scans `~/Projects` (up to 5 levels deep, ignoring `node_modules`). To scan another folder:
+
+```bash
+EXPO_PROJECTS_DIR=~/dev ./maintenance.sh
+```
+
+After cleaning, the next `npx expo start` or Android build will be slower, since the caches have to be rebuilt. If Metro behaves oddly, start it with `npx expo start --clear`.
 
 ## Log Files
 

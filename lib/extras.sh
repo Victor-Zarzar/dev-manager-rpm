@@ -72,7 +72,7 @@ install_davinci_resolve() {
         return 0
     fi
 
-    local edition="${RESOLVE_EDITION:-free}"   # free (padrão) | studio
+    local edition="${RESOLVE_EDITION:-free}"   # free (default) | studio
     local src_dir="${RESOLVE_SRC_DIR:-$HOME/Downloads}"
     local work_dir="$HOME/resolve_build"
 
